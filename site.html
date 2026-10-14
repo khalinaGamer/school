@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f4f6f2">
+	<title>Yashoda School | Student records</title>
+	<script>
+		try {
+			if (localStorage.getItem("yashodaSchoolTheme") === "dark") document.documentElement.dataset.theme = "dark";
+		} catch {}
+	</script>
+	<style>
+		:root {
+			color-scheme: light;
+			--wash: #e9f0eb;
+			--glass-surface: rgba(255, 255, 255, .72);
+			--glass-strong: rgba(255, 255, 255, .84);
+			--glass-accent: rgba(237, 244, 236, .78);
+			--ink: #1f2c27;
+			--muted: #69766f;
+			--line: #dfe6df;
+			--paper: #f4f6f2;
+			--surface: #fff;
+			--green: #246044;
+			--green-dark: #19452f;
+			--green-soft: #e8f1e9;
+			--orange: #d26c45;
+			font-family: "Segoe UI", "Aptos", sans-serif;
+			font-synthesis: none;
+			text-rendering: optimizeLegibility;
+		}
+		html { scroll-behavior: smooth; scroll-padding-top: 82px; }
+		* { box-sizing: border-box; }
+		body { min-width: 320px; margin: 0; color: var(--ink); background: linear-gradient(135deg, var(--paper), var(--wash) 52%, var(--paper)); }
+		button, input, select, textarea { font: inherit; }
+		button { color: inherit; }
+		.topbar { height: 68px; position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 0 max(24px, calc((100vw - 1180px) / 2)); background: var(--glass-surface); border-bottom: 1px solid var(--line); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+		.brand { display: flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+		.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 9px; color: #fff; background: var(--green); }
+		.brand-mark svg { width: 20px; height: 20px; }
+		.brand-name { font: 700 15px Georgia, serif; }
+		.brand-name small { display: block; margin-top: 1px; color: var(--muted); font: 600 9px "Segoe UI", sans-serif; letter-spacing: 1.25px; text-transform: uppercase; }
+		.top-actions { display: flex; align-items: center; gap: 10px; }
+		.theme-toggle { min-width: 94px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--glass-strong); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font-size: 12px; font-weight: 600; cursor: pointer; }
+		.theme-toggle:hover { border-color: #a5b7a9; }
+		.theme-track { width: 34px; height: 20px; position: relative; display: inline-flex; align-items: center; padding: 2px; border-radius: 99px; background: #cbd5cd; transition: background .18s; }
+		.theme-thumb { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 50%; color: #425248; background: #fff; box-shadow: 0 1px 3px #0002; transform: translateX(0); transition: transform .18s; }
+		.theme-thumb svg { width: 11px; height: 11px; }
+		.moon-icon { display: none; }
+		.button { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 13px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--glass-strong); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font-size: 13px; font-weight: 600; cursor: pointer; }
+		.button:hover { border-color: #a5b7a9; background: #fbfcfa; }
+		.button svg { width: 16px; height: 16px; flex: 0 0 auto; }
+		.button-primary { border-color: var(--green); color: #fff; background: var(--green); }
+		.button-primary:hover { border-color: var(--green-dark); background: var(--green-dark); }
+		.button-quiet { border-color: transparent; background: transparent; }
+		.button-danger { color: #a74331; border-color: #edcfc7; }
+		main { width: min(100% - 48px, 1180px); margin: 0 auto; padding: 38px 0 64px; }
+		.page-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 25px; }
+		.eyebrow { margin: 0 0 7px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; }
+		h1, h2, h3, p { margin-top: 0; }
+		h1 { margin-bottom: 6px; font: 700 32px/1.12 Georgia, serif; letter-spacing: -.4px; }
+		.subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+		.privacy-note { display: flex; align-items: center; gap: 9px; margin-bottom: 22px; padding: 12px 14px; border: 1px solid #dce8dc; border-radius: 8px; color: #42604c; background: var(--glass-accent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-size: 12px; line-height: 1.5; }
+		.privacy-note svg { width: 17px; height: 17px; flex: 0 0 auto; }
+		.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
+		.stat { min-height: 80px; padding: 15px 17px; border: 1px solid var(--line); border-radius: 9px; background: var(--glass-strong); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+		.stat-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+		.stat-value { font: 700 22px Georgia, serif; }
+		.archive { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--glass-strong); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+		.archive-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 17px; border-bottom: 1px solid var(--line); }
+		.archive-toolbar h2 { margin: 0; font: 700 16px Georgia, serif; }
+		.result-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+		.filters { display: grid; grid-template-columns: minmax(210px, 1fr) minmax(150px, 205px) minmax(160px, 205px) auto; gap: 10px; padding: 14px 17px; border-bottom: 1px solid var(--line); background: var(--glass-surface); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+		.field-control { position: relative; min-width: 0; }
+		.field-control svg { position: absolute; top: 50%; left: 11px; width: 16px; height: 16px; color: #7d8981; transform: translateY(-50%); pointer-events: none; }
+		.input, .select, .textarea { width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid #dce3dc; border-radius: 7px; outline: none; color: var(--ink); background: #fff; font-size: 13px; }
+		.input:focus, .select:focus, .textarea:focus { border-color: #6d9d79; box-shadow: 0 0 0 3px #24604417; }
+		.field-control .input { padding-left: 36px; }
+		.filters .button { align-self: stretch; min-height: 40px; }
+		.category-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; padding: 16px; }
+		.category-list[hidden], .record-list[hidden] { display: none; }
+		.category-card { min-width: 0; min-height: 126px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); text-align: left; background: var(--glass-strong); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); cursor: pointer; transition: transform .16s, border-color .16s, box-shadow .16s; }
+		.category-card:hover { transform: translateY(-2px); border-color: #9bb7a1; box-shadow: 0 8px 18px #203a2812; }
+		.category-card:focus-visible { outline: 3px solid #6d9d79; outline-offset: 2px; }
+		.category-card-top { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+		.category-kind { color: var(--green); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+		.category-arrow { color: var(--green); font-size: 19px; line-height: 1; }
+		.category-card-title { display: block; max-width: 100%; overflow-wrap: anywhere; font: 700 18px Georgia, serif; }
+		.category-card-meta { color: var(--muted); font-size: 12px; }
+		.archive-title-group { min-width: 0; }
+		.record-list { display: grid; }
+		.record { display: grid; grid-template-columns: minmax(180px, 1.4fr) minmax(120px, .85fr) minmax(140px, 1fr) minmax(145px, 1fr) auto; align-items: center; gap: 16px; padding: 15px 18px; border-bottom: 1px solid #edf0ed; }
+		.record:last-child { border-bottom: 0; }
+		.record:hover { background: #fcfdfb; }
+		.student-name { display: flex; align-items: center; gap: 11px; min-width: 0; }
+		.initials { width: 38px; height: 38px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; color: var(--green); background: var(--green-soft); font-size: 12px; font-weight: 700; }
+		.name-block { min-width: 0; }
+		.name-block strong { display: block; overflow: hidden; margin-bottom: 3px; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+		.name-block span, .record-detail span { display: block; overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+		.record-detail strong { display: block; overflow: hidden; margin-bottom: 4px; font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+		.year-badge { justify-self: start; padding: 5px 8px; border-radius: 5px; color: #3c6149; background: #edf4ee; font-size: 11px; font-weight: 600; white-space: nowrap; }
+		.record-open { min-height: 36px; padding: 0 9px; border: 1px solid transparent; border-radius: 6px; color: var(--green); background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; }
+		.record-open:hover { border-color: var(--line); background: #fff; }
+		.empty { padding: 54px 20px; text-align: center; }
+		.empty-mark { width: 46px; height: 46px; display: grid; place-items: center; margin: 0 auto 14px; border-radius: 13px; color: var(--green); background: var(--green-soft); }
+		.empty-mark svg { width: 23px; height: 23px; }
+		.empty h3 { margin-bottom: 7px; font: 700 18px Georgia, serif; }
+		.empty p { max-width: 380px; margin: 0 auto 17px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+		.empty .button { min-height: 40px; }
+		.dialog { width: min(700px, calc(100% - 28px)); max-height: min(88vh, 860px); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--glass-strong); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); box-shadow: 0 24px 80px #1f2c2733; }
+		.dialog::backdrop { background: #1d2923a8; backdrop-filter: blur(2px); }
+		.dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 20px 22px 16px; border-bottom: 1px solid var(--line); }
+		.dialog-head .eyebrow { margin-bottom: 5px; }
+		.dialog-head h2 { margin: 0; font: 700 22px Georgia, serif; }
+		.dialog-body { max-height: calc(88vh - 150px); overflow-y: auto; padding: 18px 22px 22px; }
+		.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+		.form-field { min-width: 0; }
+		.form-field.full { grid-column: 1 / -1; }
+		.form-field label { display: block; margin: 0 0 6px; color: #48564e; font-size: 12px; font-weight: 600; }
+		.form-field label .required { color: var(--orange); }
+		.textarea { min-height: 84px; resize: vertical; }
+		.section-label { grid-column: 1 / -1; margin: 4px 0 -4px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+		.dialog-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 22px; border-top: 1px solid var(--line); background: #fbfcfa; }
+		.dialog-foot-right { display: flex; gap: 8px; }
+		.toast { position: fixed; right: 24px; bottom: 24px; z-index: 8; max-width: min(420px, calc(100% - 32px)); padding: 12px 16px; border: 1px solid #294d38; border-radius: 8px; color: #fff; background: #244c35; font-size: 13px; box-shadow: 0 8px 24px #15241b30; opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .18s, transform .18s; }
+		.toast.visible { opacity: 1; transform: translateY(0); }
+		.import-input { display: none; }
+		:root[data-theme="dark"] {
+			color-scheme: dark;
+			--wash: #1b2820;
+			--glass-surface: rgba(32, 43, 36, .76);
+			--glass-strong: rgba(32, 43, 36, .9);
+			--glass-accent: rgba(36, 55, 42, .82);
+			--ink: #edf3ee;
+			--muted: #aab7ae;
+			--line: #3b4a40;
+			--paper: #151d18;
+			--surface: #202b24;
+			--green: #80b991;
+			--green-dark: #6fa781;
+			--green-soft: #2d4033;
+			--orange: #ed9a78;
+		}
+		:root[data-theme="dark"] .topbar,
+		:root[data-theme="dark"] .dialog,
+		:root[data-theme="dark"] .button:not(.button-primary),
+		:root[data-theme="dark"] .input,
+		:root[data-theme="dark"] .select,
+		:root[data-theme="dark"] .textarea { color: var(--ink); background: var(--surface); border-color: var(--line); }
+		:root[data-theme="dark"] .topbar,
+		:root[data-theme="dark"] .dialog { background: var(--glass-strong); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
+		:root[data-theme="dark"] .button:not(.button-primary) { background: var(--glass-strong); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+		:root[data-theme="dark"] .button:not(.button-primary):hover,
+		:root[data-theme="dark"] .record-open:hover { background: #29372e; }
+		:root[data-theme="dark"] .filters,
+		:root[data-theme="dark"] .dialog-foot { background: var(--glass-surface); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+		:root[data-theme="dark"] .privacy-note { color: #c5dfca; background: var(--glass-accent); border-color: #3b5944; }
+		:root[data-theme="dark"] .record { border-color: #303e35; }
+		:root[data-theme="dark"] .record:hover { background: #253229; }
+		:root[data-theme="dark"] .initials,
+		:root[data-theme="dark"] .year-badge,
+		:root[data-theme="dark"] .empty-mark { color: #c4e4cb; background: #304637; }
+		:root[data-theme="dark"] .form-field label { color: #d0dbd2; }
+		:root[data-theme="dark"] .field-control svg { color: #aebbb2; }
+		:root[data-theme="dark"] .button-danger { color: #ffb4a3; border-color: #704a40; }
+		:root[data-theme="dark"] .theme-track { background: var(--green); }
+		:root[data-theme="dark"] .theme-thumb { color: #405147; transform: translateX(14px); }
+		:root[data-theme="dark"] .sun-icon { display: none; }
+		:root[data-theme="dark"] .moon-icon { display: block; }
+		@media (max-width: 900px) {
+			main { width: min(100% - 36px, 760px); padding-top: 30px; }
+			.filters { grid-template-columns: minmax(180px, 1fr) 1fr 1fr; }
+			.filters .button { grid-column: 1 / -1; justify-self: end; }
+			.record { grid-template-columns: minmax(160px, 1.4fr) minmax(110px, .8fr) minmax(130px, 1fr) auto; }
+			.record > .record-detail:nth-of-type(3) { display: none; }
+		}
+		@media (max-width: 600px) {
+			.topbar { height: 60px; padding: 0 14px; }
+			.top-actions { gap: 5px; }
+			.top-actions .button { min-height: 38px; padding: 0 9px; font-size: 12px; }
+			.top-actions .button svg { display: none; }
+			.theme-toggle { min-width: 38px; width: 38px; min-height: 38px; padding: 0; }
+			.theme-label { display: none; }
+			main { width: calc(100% - 24px); padding: 25px 0 42px; }
+			.page-head { align-items: flex-start; flex-direction: column; gap: 15px; margin-bottom: 17px; }
+			h1 { font-size: 29px; }
+			.page-head .top-actions-mobile { display: flex; gap: 8px; }
+			.privacy-note { align-items: flex-start; margin-bottom: 14px; padding: 10px 11px; }
+			.stats { gap: 7px; margin-bottom: 15px; }
+			.stat { min-height: 70px; padding: 11px 10px; }
+			.stat-label { font-size: 9px; letter-spacing: .3px; }
+			.stat-value { font-size: 19px; }
+			.archive-toolbar { padding: 13px 12px; }
+			.category-list { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 9px; padding: 11px; }
+			.category-card { min-height: 112px; padding: 12px; }
+			.filters { grid-template-columns: 1fr 1fr; gap: 8px; padding: 11px 12px; }
+			.filters .search-control { grid-column: 1 / -1; }
+			.filters .button { grid-column: auto; justify-self: stretch; padding: 0 8px; font-size: 12px; }
+			.record { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 8px; padding: 13px 12px; }
+			.record > .record-detail, .record > .year-badge { grid-column: 1; margin-left: 49px; }
+			.record > .student-name { grid-column: 1; grid-row: 1; }
+			.record > .record-open { grid-column: 2; grid-row: 1; }
+			.record > .record-detail:nth-of-type(2) { grid-row: 2; }
+			.record > .record-detail:nth-of-type(3) { display: block; grid-row: 3; }
+			.record > .year-badge { grid-row: 4; }
+			.record-detail strong { max-width: 100%; }
+			.dialog-head { padding: 16px 16px 13px; }
+			.dialog-body { padding: 15px 16px 18px; }
+			.form-grid { grid-template-columns: 1fr; gap: 12px; }
+			.form-field.full, .section-label { grid-column: auto; }
+			.dialog-foot { padding: 12px 16px; }
+			.dialog-foot .button { min-height: 40px; padding: 0 10px; font-size: 12px; }
+			.toast { right: 12px; bottom: 12px; }
+		}
+		@media (max-width: 360px) {
+			.topbar { padding: 0 10px; }
+			.brand { gap: 7px; }
+			.brand-name { font-size: 14px; }
+			.top-actions .button { padding: 0 7px; font-size: 11px; }
+			.top-actions { gap: 3px; }
+			.top-actions .utility-button { width: 30px; padding: 0; font-size: 0; }
+			.top-actions .utility-button svg { display: block; width: 14px; height: 14px; }
+			.theme-toggle { min-width: 34px; width: 34px; }
+			.theme-track { width: 28px; }
+			:root[data-theme="dark"] .theme-thumb { transform: translateX(8px); }
+			main { width: calc(100% - 20px); }
+			.filters { grid-template-columns: 1fr; }
+			.filters .search-control, .filters .button { grid-column: auto; }
+			.stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+			.stat { padding: 10px 7px; }
+			.stat-label { font-size: 8px; }
+			.dialog-foot { align-items: stretch; flex-direction: column-reverse; }
+			.dialog-foot-right { justify-content: flex-end; }
+		}
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+	</style>
+</head>
+<body>
+	<header class="topbar">
+		<a class="brand" href="#" aria-label="Yashoda School home">
+			<span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5-9 5.5-9-5.5Z"/><path d="M6.5 12v5c3.5 2.5 7.5 2.5 11 0v-5M21 10v6"/></svg></span>
+			<span class="brand-name">Yashoda School<small>Student records</small></span>
+		</a>
+		<div class="top-actions">
+			<button class="button utility-button" id="importButton" type="button" aria-label="Import CSV or JSON backup" title="Import CSV or JSON backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3m-4 4 4-4 4 4"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Import CSV</button>
+			<button class="button utility-button" id="exportButton" type="button" aria-label="Export CSV" title="Export CSV for Excel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>Export CSV</button>
+			<input class="import-input" id="importFile" type="file" accept=".csv,text/csv,application/vnd.ms-excel,.json,application/json">
+			<button class="button button-primary" id="addButton" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add student</button>
+			<button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Dark mode" title="Switch to dark mode"><span class="theme-track" aria-hidden="true"><span class="theme-thumb"><svg class="sun-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 1v2m0 10v2M1 8h2m10 0h2M3 3l1.4 1.4m7.2 7.2L13 13M13 3l-1.4 1.4m-7.2 7.2L3 13"/></svg><svg class="moon-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.3 10.1A5.8 5.8 0 0 1 5.9 2.7 5.8 5.8 0 1 0 13.3 10Z"/></svg></span></span><span class="theme-label">Dark mode</span></button>
+		</div>
+	</header>
+
+	<main>
+		<section class="page-head">
+			<div><p class="eyebrow">Your private school archive</p><h1>Student records</h1><p class="subtitle">Keep a decade of student details organized and easy to find.</p></div>
+		</section>
+
+		<aside class="privacy-note">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg>
+			<span>Records stay in this browser on this device. This is not password-protected or synced. Anyone with access to this browser may be able to view them; export backups and store them securely.</span>
+		</aside>
+
+		<section class="stats" aria-label="Archive summary">
+			<article class="stat"><span class="stat-label">Student records</span><strong class="stat-value" id="studentTotal">0</strong></article>
+			<article class="stat"><span class="stat-label">School years covered</span><strong class="stat-value" id="yearTotal">0</strong></article>
+			<article class="stat"><span class="stat-label">Latest entry</span><strong class="stat-value" id="latestEntry">—</strong></article>
+		</section>
+
+		<section class="archive" aria-labelledby="archiveTitle">
+			<div class="archive-toolbar"><div class="archive-title-group"><nav class="breadcrumbs" id="breadcrumbs" aria-label="School record categories" hidden></nav><h2 id="archiveTitle">School years</h2></div><span class="result-count" id="resultCount" aria-live="polite">0 records</span></div>
+			<div class="filters">
+				<div class="field-control search-control"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4 4"/></svg><input class="input" id="searchInput" type="search" placeholder="Search name, ID, grade, guardian..." aria-label="Search student records"></div>
+				<select class="select" id="yearFilter" aria-label="Filter by school year"><option value="">All school years</option></select>
+				<div class="field-control"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><input class="input" id="dateFilter" type="date" aria-label="Filter by birth, enrollment, or graduation date" title="Matches date of birth, enrollment, or graduation"></div>
+				<button class="button" id="clearFilters" type="button">Clear filters</button>
+			</div>
+			<div class="category-list" id="categoryList"></div>
+			<div class="record-list" id="recordList" hidden></div>
+			<div class="empty" id="emptyState" hidden>
+				<span class="empty-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5-9 5.5-9-5.5Z"/><path d="M6.5 12v5c3.5 2.5 7.5 2.5 11 0v-5"/></svg></span>
+				<h3 id="emptyTitle">Your archive starts here</h3>
+				<p id="emptyText">Add a student record to begin organizing your school data. Your records will be saved in this browser.</p>
+				<button class="button button-primary" id="emptyAddButton" type="button">Add first student</button>
+			</div>
+		</section>
+	</main>
+
+	<dialog class="dialog" id="studentDialog" aria-labelledby="dialogTitle">
+		<form id="studentForm">
+			<div class="dialog-head"><div><p class="eyebrow">Student profile</p><h2 id="dialogTitle">Add student</h2></div><button class="button button-quiet" id="closeDialog" type="button" aria-label="Close form">Close</button></div>
+			<div class="dialog-body">
+				<div class="form-grid">
+					<div class="form-field"><label for="fullName">Full name <span class="required">*</span></label><input class="input" id="fullName" name="fullName" autocomplete="name" maxlength="120" required></div>
+					<div class="form-field"><label for="studentId">Student ID <span class="required">*</span></label><input class="input" id="studentId" name="studentId" maxlength="60" required></div>
+					<div class="form-field"><label for="schoolYear">School year <span class="required">*</span></label><input class="input" id="schoolYear" name="schoolYear" placeholder="e.g. 2025–2026" maxlength="30" required></div>
+					<div class="form-field"><label for="grade">Grade / class</label><input class="input" id="grade" name="grade" placeholder="e.g. Grade 8 · 8B" maxlength="80"></div>
+					<div class="section-label">Student information</div>
+					<div class="form-field"><label for="birthDate">Date of birth</label><input class="input" id="birthDate" name="birthDate" type="date"></div>
+					<div class="form-field"><label for="enrollmentDate">Enrollment date</label><input class="input" id="enrollmentDate" name="enrollmentDate" type="date"></div>
+					<div class="form-field"><label for="graduationDate">Graduation / leaving date</label><input class="input" id="graduationDate" name="graduationDate" type="date"></div>
+					<div class="form-field"><label for="studentEmail">Student email</label><input class="input" id="studentEmail" name="studentEmail" type="email" autocomplete="email" maxlength="160"></div>
+					<div class="section-label">Parent or guardian</div>
+					<div class="form-field"><label for="guardianName">Guardian name</label><input class="input" id="guardianName" name="guardianName" autocomplete="name" maxlength="120"></div>
+					<div class="form-field"><label for="guardianPhone">Guardian phone</label><input class="input" id="guardianPhone" name="guardianPhone" type="tel" autocomplete="tel" maxlength="50"></div>
+					<div class="form-field"><label for="guardianEmail">Guardian email</label><input class="input" id="guardianEmail" name="guardianEmail" type="email" autocomplete="email" maxlength="160"></div>
+					<div class="form-field"><label for="address">Address</label><input class="input" id="address" name="address" autocomplete="street-address" maxlength="240"></div>
+					<div class="form-field full"><label for="notes">Notes</label><textarea class="textarea" id="notes" name="notes" maxlength="2000" placeholder="Relevant school information"></textarea></div>
+				</div>
+			</div>
+			<div class="dialog-foot"><button class="button button-danger" id="deleteButton" type="button" hidden>Delete record</button><div class="dialog-foot-right"><button class="button" id="cancelButton" type="button">Cancel</button><button class="button button-primary" type="submit">Save record</button></div></div>
+		</form>
+	</dialog>
+	<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+	<script>
+		const DATABASE_NAME = "schoolArchive";
+		const DATABASE_VERSION = 1;
+		const STORE_NAME = "students";
+		const fields = ["fullName", "studentId", "schoolYear", "grade", "birthDate", "enrollmentDate", "graduationDate", "studentEmail", "guardianName", "guardianPhone", "guardianEmail", "address", "notes"];
+		const csvColumns = [
+			{ key: "fullName", label: "Full name" },
+			{ key: "studentId", label: "Student ID" },
+			{ key: "schoolYear", label: "School year" },
+			{ key: "grade", label: "Class / grade" },
+			{ key: "birthDate", label: "Date of birth" },
+			{ key: "enrollmentDate", label: "Enrollment date" },
+			{ key: "graduationDate", label: "Graduation / leaving date" },
+			{ key: "studentEmail", label: "Student email" },
+			{ key: "guardianName", label: "Guardian name" },
+			{ key: "guardianPhone", label: "Guardian phone" },
+			{ key: "guardianEmail", label: "Guardian email" },
+			{ key: "address", label: "Address" },
+			{ key: "notes", label: "Notes" },
+			{ key: "createdAt", label: "Record created" },
+			{ key: "updatedAt", label: "Last updated" }
+		];
+		const databasePromise = openDatabase();
+		const UNASSIGNED_CLASS = "__unassigned_class__";
+		let students = [];
+		let editingId = null;
+		let selectedYear = "";
+		let selectedClass = null;
+		let toastTimer;
+		const themeToggle = document.querySelector("#themeToggle");
+
+		function setTheme(theme, persist = true) {
+			const isDark = theme === "dark";
+			document.documentElement.dataset.theme = isDark ? "dark" : "light";
+			themeToggle.setAttribute("aria-checked", String(isDark));
+			themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+			document.querySelector('meta[name="theme-color"]').content = isDark ? "#151d18" : "#f4f6f2";
+			if (persist) {
+				try { localStorage.setItem("yashodaSchoolTheme", isDark ? "dark" : "light"); }
+				catch {}
+			}
+		}
+
+		setTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light", false);
+		themeToggle.addEventListener("click", () => setTheme(themeToggle.getAttribute("aria-checked") === "false" ? "dark" : "light"));
+
+		function openDatabase() {
+			return new Promise((resolve, reject) => {
+				const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+				request.onupgradeneeded = () => {
+					if (!request.result.objectStoreNames.contains(STORE_NAME)) request.result.createObjectStore(STORE_NAME, { keyPath: "id" });
+				};
+				request.onsuccess = () => resolve(request.result);
+				request.onerror = () => reject(request.error || new Error("Could not open the local database."));
+			});
+		}
+
+		async function getAllStudents() {
+			const database = await databasePromise;
+			return new Promise((resolve, reject) => {
+				const request = database.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).getAll();
+				request.onsuccess = () => resolve(request.result);
+				request.onerror = () => reject(request.error || new Error("Could not read student records."));
+			});
+		}
+
+		async function saveStudent(student) {
+			const database = await databasePromise;
+			return new Promise((resolve, reject) => {
+				const transaction = database.transaction(STORE_NAME, "readwrite");
+				transaction.objectStore(STORE_NAME).put(student);
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => reject(transaction.error || new Error("Could not save this record."));
+				transaction.onabort = () => reject(transaction.error || new Error("Saving this record was cancelled."));
+			});
+		}
+
+		async function removeStudent(id) {
+			const database = await databasePromise;
+			return new Promise((resolve, reject) => {
+				const transaction = database.transaction(STORE_NAME, "readwrite");
+				transaction.objectStore(STORE_NAME).delete(id);
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => reject(transaction.error || new Error("Could not delete this record."));
+			});
+		}
+
+		function showToast(message) {
+			const toast = document.querySelector("#toast");
+			toast.textContent = message;
+			toast.classList.add("visible");
+			clearTimeout(toastTimer);
+			toastTimer = setTimeout(() => toast.classList.remove("visible"), 2800);
+		}
+
+		function formatDate(value) {
+			if (!value) return "Not provided";
+			const date = new Date(`${value}T00:00:00`);
+			return Number.isNaN(date.valueOf()) ? value : new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric" }).format(date);
+		}
+
+		function initials(name) {
+			return (name || "?").trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase();
+		}
+
+		function escapeText(value) {
+			return String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[character]);
+		}
+
+		function csvCell(value) {
+			let text = String(value ?? "");
+			if (/^[\t\r ]*[=+\-@]/.test(text)) text = `'${text}`;
+			return `"${text.replace(/"/g, '""')}"`;
+		}
+
+		function createCsv(records) {
+			const rows = [csvColumns.map(column => column.label), ...records.map(record => csvColumns.map(column => record[column.key] || ""))];
+			return rows.map(row => row.map(csvCell).join(",")).join("\r\n");
+		}
+
+		function parseCsv(source) {
+			const text = source.replace(/^\uFEFF/, "");
+			const rows = [];
+			let row = [];
+			let value = "";
+			let quoted = false;
+			for (let index = 0; index < text.length; index++) {
+				const character = text[index];
+				if (quoted) {
+					if (character === '"' && text[index + 1] === '"') {
+						value += '"';
+						index++;
+					} else if (character === '"') {
+						quoted = false;
+					} else {
+						value += character;
+					}
+				} else if (character === '"' && value === "") {
+					quoted = true;
+				} else if (character === ",") {
+					row.push(value);
+					value = "";
+				} else if (character === "\r" || character === "\n") {
+					row.push(value);
+					if (row.some(cell => cell !== "")) rows.push(row);
+					row = [];
+					value = "";
+					if (character === "\r" && text[index + 1] === "\n") index++;
+				} else {
+					value += character;
+				}
+			}
+			if (quoted) throw new Error("The CSV file contains an unclosed quoted field.");
+			if (row.length || value) {
+				row.push(value);
+				if (row.some(cell => cell !== "")) rows.push(row);
+			}
+			return rows;
+		}
+
+		function restoreCsvCell(value) {
+			return value.startsWith("'") && /^[\t\r ]*[=+\-@]/.test(value.slice(1)) ? value.slice(1) : value;
+		}
+
+		function updateYearOptions() {
+			const select = document.querySelector("#yearFilter");
+			const selected = select.value;
+			const current = new Date().getFullYear();
+			const years = new Set(students.map(student => student.schoolYear).filter(Boolean));
+			for (let offset = 0; offset < 10; offset++) years.add(`${current - offset}–${current - offset + 1}`);
+			select.replaceChildren(new Option("All school years", ""));
+			[...years].sort((a, b) => b.localeCompare(a, undefined, { numeric: true })).forEach(year => select.add(new Option(year, year)));
+			if ([...select.options].some(option => option.value === selected)) select.value = selected;
+		}
+
+		function filteredStudents() {
+			const query = document.querySelector("#searchInput").value.trim().toLocaleLowerCase();
+			const year = document.querySelector("#yearFilter").value;
+			const date = document.querySelector("#dateFilter").value;
+			return students.filter(student => {
+				const matchesText = !query || fields.map(field => student[field] || "").join(" ").toLocaleLowerCase().includes(query);
+				const matchesYear = !year || student.schoolYear === year;
+				const matchesDate = !date || [student.birthDate, student.enrollmentDate, student.graduationDate].includes(date);
+				return matchesText && matchesYear && matchesDate;
+			}).sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || "") || a.fullName.localeCompare(b.fullName));
+		}
+
+		function classValue(student) {
+			return student.grade || UNASSIGNED_CLASS;
+		}
+
+		function classLabel(value) {
+			return value === UNASSIGNED_CLASS ? "Class not set" : value;
+		}
+
+		function createCategoryCard(kind, value, title, detail) {
+			const card = document.createElement("button");
+			card.type = "button";
+			card.className = "category-card";
+			card.dataset.categoryKind = kind;
+			card.dataset.categoryValue = value;
+			card.innerHTML = `<span class="category-card-top"><span class="category-kind">${kind === "year" ? "School year" : "Class"}</span><span class="category-arrow" aria-hidden="true">›</span></span><strong class="category-card-title">${escapeText(title)}</strong><span class="category-card-meta">${escapeText(detail)}</span>`;
+			return card;
+		}
+
+		function render() {
+			updateYearOptions();
+			const filtered = filteredStudents();
+			const list = document.querySelector("#recordList");
+			const categoryList = document.querySelector("#categoryList");
+			list.replaceChildren();
+			categoryList.replaceChildren();
+			document.querySelector("#studentTotal").textContent = students.length.toLocaleString();
+			document.querySelector("#yearTotal").textContent = new Set(students.map(student => student.schoolYear).filter(Boolean)).size.toLocaleString();
+			const latest = [...students].sort((a, b) => (b.updatedAt || b.createdAt || "").localeCompare(a.updatedAt || a.createdAt || ""))[0];
+			document.querySelector("#latestEntry").textContent = latest ? formatDate((latest.updatedAt || latest.createdAt).slice(0, 10)) : "—";
+			const query = document.querySelector("#searchInput").value.trim();
+			const date = document.querySelector("#dateFilter").value;
+			const searching = Boolean(query || date);
+			let visibleStudents = [];
+			let categoryCount = 0;
+			let title = "School years";
+
+			if (searching) {
+				visibleStudents = filtered;
+				title = date && !query ? "Students for this date" : "Search results";
+			} else if (selectedClass !== null) {
+				visibleStudents = filtered.filter(student => student.schoolYear === selectedYear && classValue(student) === selectedClass);
+				title = classLabel(selectedClass);
+			} else if (selectedYear) {
+				const yearStudents = students.filter(student => student.schoolYear === selectedYear);
+				const classes = new Map();
+				for (const student of yearStudents) {
+					const value = classValue(student);
+					classes.set(value, (classes.get(value) || 0) + 1);
+				}
+				for (const [value, count] of [...classes].sort(([a], [b]) => classLabel(a).localeCompare(classLabel(b)))) {
+					categoryList.append(createCategoryCard("class", value, classLabel(value), `${count} ${count === 1 ? "student" : "students"}`));
+				}
+				categoryCount = classes.size;
+				title = selectedYear;
+			} else {
+				const years = new Map();
+				for (const student of students) {
+					const year = student.schoolYear || "School year not set";
+					if (!years.has(year)) years.set(year, []);
+					years.get(year).push(student);
+				}
+				for (const [year, yearStudents] of [...years].sort(([a], [b]) => b.localeCompare(a, undefined, { numeric: true }))) {
+					const classCount = new Set(yearStudents.map(classValue)).size;
+					const detail = `${yearStudents.length} ${yearStudents.length === 1 ? "student" : "students"} · ${classCount} ${classCount === 1 ? "class" : "classes"}`;
+					categoryList.append(createCategoryCard("year", year, year, detail));
+				}
+				categoryCount = years.size;
+			}
+
+			const isStudentView = searching || selectedClass !== null;
+			list.hidden = !isStudentView;
+			categoryList.hidden = isStudentView;
+			if (isStudentView) {
+				document.querySelector("#resultCount").textContent = `${visibleStudents.length} ${visibleStudents.length === 1 ? "student" : "students"}`;
+			} else {
+				const noun = selectedYear ? "class" : "school year";
+				document.querySelector("#resultCount").textContent = `${categoryCount} ${categoryCount === 1 ? noun : `${noun}s`}`;
+			}
+			document.querySelector("#archiveTitle").textContent = title;
+			const breadcrumbs = document.querySelector("#breadcrumbs");
+			breadcrumbs.hidden = searching || !selectedYear;
+			if (!breadcrumbs.hidden) {
+				const rootCrumb = '<button type="button" data-breadcrumb="years">All school years</button>';
+				const separator = '<span aria-hidden="true">›</span>';
+				breadcrumbs.innerHTML = selectedClass === null
+					? `${rootCrumb}${separator}<span aria-current="page">${escapeText(selectedYear)}</span>`
+					: `${rootCrumb}${separator}<button type="button" data-breadcrumb="year">${escapeText(selectedYear)}</button>${separator}<span aria-current="page">${escapeText(classLabel(selectedClass))}</span>`;
+			}
+
+			for (const student of visibleStudents) {
+				const card = document.createElement("article");
+				card.className = "record";
+				const studentName = document.createElement("div");
+				studentName.className = "student-name";
+				const initialsNode = document.createElement("span");
+				initialsNode.className = "initials";
+				initialsNode.textContent = initials(student.fullName);
+				const nameBlock = document.createElement("div");
+				nameBlock.className = "name-block";
+				nameBlock.innerHTML = `<strong>${escapeText(student.fullName)}</strong><span>ID ${escapeText(student.studentId)}</span>`;
+				studentName.append(initialsNode, nameBlock);
+
+				const grade = document.createElement("div");
+				grade.className = "record-detail";
+				grade.innerHTML = `<strong>${escapeText(student.grade || "Grade not set")}</strong><span>${student.birthDate ? `Born ${escapeText(formatDate(student.birthDate))}` : "Birth date not provided"}</span>`;
+
+				const guardian = document.createElement("div");
+				guardian.className = "record-detail";
+				guardian.innerHTML = `<strong>${escapeText(student.guardianName || "No guardian listed")}</strong><span>${escapeText(student.guardianPhone || student.guardianEmail || "No contact details")}</span>`;
+
+				const year = document.createElement("span");
+				year.className = "year-badge";
+				year.textContent = student.schoolYear;
+
+				const open = document.createElement("button");
+				open.className = "record-open";
+				open.type = "button";
+				open.textContent = "Open record";
+				open.setAttribute("aria-label", `Open ${student.fullName}'s record`);
+				open.addEventListener("click", () => openStudent(student.id));
+				card.append(studentName, grade, guardian, year, open);
+				list.append(card);
+			}
+
+			const hasContent = isStudentView ? visibleStudents.length > 0 : categoryCount > 0;
+			const emptyState = document.querySelector("#emptyState");
+			const hasFilters = Boolean(query || document.querySelector("#yearFilter").value || date);
+			emptyState.hidden = hasContent;
+			if (!hasContent) {
+				document.querySelector("#emptyTitle").textContent = students.length && hasFilters ? "No matching records" : students.length ? "No school years found" : "Your archive starts here";
+				document.querySelector("#emptyText").textContent = students.length && hasFilters ? "Try a different name, school year, or date." : students.length ? "Add a school year to a student record to organize it here." : "Add a student record to begin organizing your school data. Your records will be saved in this browser.";
+				document.querySelector("#emptyAddButton").hidden = students.length > 0 || hasFilters;
+			}
+		}
+
+		function openStudent(id = null) {
+			editingId = id;
+			const student = id ? students.find(record => record.id === id) : null;
+			const form = document.querySelector("#studentForm");
+			form.reset();
+			document.querySelector("#dialogTitle").textContent = student ? "Edit student record" : "Add student";
+			document.querySelector("#deleteButton").hidden = !student;
+			for (const field of fields) form.elements[field].value = student?.[field] || "";
+			if (!student) {
+				const year = new Date().getFullYear();
+				form.elements.schoolYear.value = `${year}–${year + 1}`;
+			}
+			document.querySelector("#studentDialog").showModal();
+			document.querySelector("#fullName").focus();
+		}
+
+		async function refresh() {
+			students = await getAllStudents();
+			render();
+		}
+
+		document.querySelector("#addButton").addEventListener("click", () => openStudent());
+		document.querySelector("#emptyAddButton").addEventListener("click", () => openStudent());
+		document.querySelector("#closeDialog").addEventListener("click", () => document.querySelector("#studentDialog").close());
+		document.querySelector("#cancelButton").addEventListener("click", () => document.querySelector("#studentDialog").close());
+		document.querySelector("#deleteButton").addEventListener("click", async () => {
+			const student = students.find(record => record.id === editingId);
+			if (!student || !confirm(`Delete ${student.fullName}'s record? This cannot be undone.`)) return;
+			try {
+				await removeStudent(student.id);
+				document.querySelector("#studentDialog").close();
+				await refresh();
+				showToast("Student record deleted");
+			} catch (error) { showToast(error.message); }
+		});
+
+		document.querySelector("#studentForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			const form = event.currentTarget;
+			const now = new Date().toISOString();
+			const previous = students.find(student => student.id === editingId);
+			const record = { id: editingId || crypto.randomUUID(), createdAt: previous?.createdAt || now, updatedAt: now };
+			for (const field of fields) record[field] = form.elements[field].value.trim();
+			try {
+				await saveStudent(record);
+				document.querySelector("#studentDialog").close();
+				await refresh();
+				showToast(previous ? "Student record updated" : "Student record saved");
+			} catch (error) { showToast(error.message); }
+		});
+
+		document.querySelector("#searchInput").addEventListener("input", render);
+		document.querySelector("#dateFilter").addEventListener("change", render);
+		document.querySelector("#yearFilter").addEventListener("change", event => {
+			selectedYear = event.target.value;
+			selectedClass = null;
+			render();
+		});
+		document.querySelector("#categoryList").addEventListener("click", event => {
+			const card = event.target.closest("[data-category-kind]");
+			if (!card) return;
+			if (card.dataset.categoryKind === "year") {
+				selectedYear = card.dataset.categoryValue;
+				selectedClass = null;
+				document.querySelector("#yearFilter").value = "";
+			} else {
+				selectedClass = card.dataset.categoryValue;
+			}
+			render();
+		});
+		document.querySelector("#breadcrumbs").addEventListener("click", event => {
+			const crumb = event.target.closest("[data-breadcrumb]");
+			if (!crumb) return;
+			selectedClass = null;
+			if (crumb.dataset.breadcrumb === "years") {
+				selectedYear = "";
+				document.querySelector("#yearFilter").value = "";
+			}
+			render();
+		});
+		document.querySelector("#clearFilters").addEventListener("click", () => {
+			document.querySelector("#searchInput").value = "";
+			document.querySelector("#yearFilter").value = "";
+			document.querySelector("#dateFilter").value = "";
+			selectedYear = "";
+			selectedClass = null;
+			render();
+		});
+
+		document.querySelector("#exportButton").addEventListener("click", async () => {
+			try {
+				const records = await getAllStudents();
+				const csv = `\uFEFF${createCsv(records)}`;
+				const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+				const link = document.createElement("a");
+				link.href = url;
+				link.download = `yashoda-school-archive-${new Date().toISOString().slice(0, 10)}.csv`;
+				link.click();
+				URL.revokeObjectURL(url);
+				showToast("Excel-compatible CSV downloaded. Store it somewhere secure.");
+			} catch (error) { showToast(error.message); }
+		});
+
+		document.querySelector("#importButton").addEventListener("click", () => document.querySelector("#importFile").click());
+		document.querySelector("#importFile").addEventListener("change", async event => {
+			const file = event.target.files[0];
+			if (!file) return;
+			try {
+				let importedRecords;
+				if (file.name.toLowerCase().endsWith(".json")) {
+					const backup = JSON.parse(await file.text());
+					if (backup.format !== "school-archive" || backup.version !== 1 || !Array.isArray(backup.records)) throw new Error("This JSON file is not a supported Yashoda School backup.");
+					importedRecords = backup.records.filter(record => record && typeof record.fullName === "string" && typeof record.studentId === "string" && typeof record.schoolYear === "string");
+				} else {
+					const rows = parseCsv(await file.text());
+					if (!rows.length) throw new Error("This CSV file is empty.");
+					const headers = rows.shift().map(header => header.trim());
+					const indexes = new Map(csvColumns.map(column => [column.key, headers.indexOf(column.label)]));
+					const required = ["fullName", "studentId", "schoolYear"];
+					if (required.some(field => indexes.get(field) < 0)) throw new Error("The CSV must include Full name, Student ID, and School year columns.");
+					importedRecords = rows.map(row => {
+						const valueFor = key => {
+							const index = indexes.get(key);
+							return index < 0 ? "" : restoreCsvCell(row[index] || "");
+						};
+						const now = new Date().toISOString();
+						const record = { id: crypto.randomUUID(), createdAt: valueFor("createdAt") || now, updatedAt: valueFor("updatedAt") || now };
+						for (const field of fields) record[field] = valueFor(field).slice(0, field === "notes" ? 2000 : 240);
+						return record;
+					}).filter(record => record.fullName && record.studentId && record.schoolYear);
+				}
+				if (!importedRecords.length) throw new Error("No valid student records were found in this file.");
+				if (!confirm(`Import ${importedRecords.length} student records as new entries? Existing records will not be changed.`)) return;
+				for (const record of importedRecords) await saveStudent(record);
+				await refresh();
+				showToast(`${importedRecords.length} records imported`);
+			} catch (error) { showToast(error instanceof SyntaxError ? "Could not read this CSV or JSON backup" : error.message); }
+			finally { event.target.value = ""; }
+		});
+
+		databasePromise.then(refresh).catch(error => {
+			document.querySelector("#emptyTitle").textContent = "Local database unavailable";
+			document.querySelector("#emptyText").textContent = `${error.message} Try opening this page in a current browser.`;
+			document.querySelector("#emptyState").hidden = false;
+			document.querySelector("#emptyAddButton").hidden = true;
+		});
+	</script>
+</body>
+</html>
